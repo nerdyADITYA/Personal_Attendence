@@ -264,7 +264,52 @@ h1 {
   color: var(--text-secondary);
 }
 
-.btn-modal.cancel:hover {
-  border-color: white;
-  color: white;
+
+/* ... existing styles ... */
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .app {
+    padding: 1rem;
+    gap: 1.5rem;
+  }
+
+  .header {
+    flex-direction: column;
+    gap: 1rem;
+    text-align: center;
+  }
+
+  .user-info {
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  h1 {
+    font-size: 1.8rem;
+    line-height: 1.2;
+  }
+
+  .clock {
+    font-size: 13vw;
+    /* Responsive font size based on viewport width */
+    padding: 1rem;
+    width: 100%;
+    box-sizing: border-box;
+    display: flex;
+    justify-content: center;
+    white-space: nowrap;
+    /* Prevent wrapping */
+  }
+
+  .controls {
+    flex-direction: column;
+    width: 100%;
+    align-items: center;
+  }
+
+  .btn-punch {
+    width: 100%;
+    max-width: 300px;
+  }
 }

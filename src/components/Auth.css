@@ -136,3 +136,26 @@
     align-items: center;
     justify-content: center;
 }
+
+/* Responsive Design for Auth Pages */
+@media (max-width: 480px) {
+    .auth-box {
+        padding: 2rem 1.5rem;
+        max-width: 90%;
+        margin: 0 1rem;
+    }
+
+    .auth-box h2 {
+        font-size: 1.8rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .input-group input {
+        padding: 0.9rem 1rem;
+    }
+
+    .auth-btn {
+        padding: 0.9rem;
+        font-size: 1rem;
+    }
+}
