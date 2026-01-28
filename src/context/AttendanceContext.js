@@ -11,7 +11,7 @@ export const AttendanceProvider = ({ children }) => {
 
     // Load state from server only
     useEffect(() => {
-        fetch('http://localhost:5001/api/attendance')
+        fetch('/api/attendance')
             .then(res => res.json())
             .then(data => {
                 setHistory(data);
@@ -141,7 +141,7 @@ export const AttendanceProvider = ({ children }) => {
         setPunchInTime(null);
 
         // Save to Server
-        fetch('http://localhost:5001/api/attendance', {
+        fetch('/api/attendance', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(updatedRecord)
