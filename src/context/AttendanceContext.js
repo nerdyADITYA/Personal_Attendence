@@ -1,4 +1,5 @@
 import React, { createContext, useState, useEffect, useContext } from 'react';
+import { useAuth } from './AuthContext';
 
 const AttendanceContext = createContext();
 
@@ -8,51 +9,54 @@ export const AttendanceProvider = ({ children }) => {
     const [punchInTime, setPunchInTime] = useState(null);
     const [punchOutTime, setPunchOutTime] = useState(null);
     const [history, setHistory] = useState([]);
+    const { token } = useAuth(); // Get token
 
-    // Load state from server only
+    // Load state from server only when token is available
     useEffect(() => {
-        fetch('/api/attendance')
-            .then(res => res.json())
-            .then(data => {
-                setHistory(data);
-                // Check for active punch-in (record with no punchOut)
-                // Assuming the most recent record is at valid index 0 if unshift() is used
-                const activeRecord = data.find(r => r.punchOut === null);
-                if (activeRecord) {
-                    // Support manual JSON edits: Prefer 'date' + 'punchIn' over 'timestamp'
-                    // Parse "DD/MM/YYYY" or standard date formats
-                    try {
-                        let dateObj;
-                        if (activeRecord.date && activeRecord.punchIn) {
-                            const dateParts = activeRecord.date.split('/');
-                            // Handle DD/MM/YYYY format explicitly if detected
-                            if (dateParts.length === 3) {
-                                const [day, month, year] = dateParts;
-                                // Handle 12h/24h time format? Date.parse handles standard formats well 
-                                // but we need ISO for stability: YYYY-MM-DDTHH:mm:ss
-                                // But punchIn might be "5:40:00 PM" or "08:33:24"
-                                const timeStr = activeRecord.punchIn;
-                                // Simple construction for Date constructor
-                                dateObj = new Date(`${year}-${month}-${day} ${timeStr}`);
-                            } else {
-                                dateObj = new Date(activeRecord.date + ' ' + activeRecord.punchIn);
-                            }
-                        } else if (activeRecord.timestamp) {
-                            dateObj = new Date(activeRecord.timestamp);
-                        }
+        if (!token) return;
 
-                        if (dateObj && !isNaN(dateObj.getTime())) {
-                            setPunchInTime(dateObj);
+        fetch('/api/attendance', {
+            headers: { 'Authorization': `Bearer ${token}` }
+        })
+            .then(res => {
+                if (res.status === 401 || res.status === 403) throw new Error("Unauthorized");
+                return res.json();
+            })
+            .then(data => {
+                if (Array.isArray(data)) {
+                    setHistory(data);
+                    const activeRecord = data.find(r => r.punchOut === null);
+                    if (activeRecord) {
+                        try {
+                            let dateObj;
+                            if (activeRecord.date && activeRecord.punchIn) {
+                                const dateParts = activeRecord.date.split('/');
+                                if (dateParts.length === 3) {
+                                    const [day, month, year] = dateParts;
+                                    const timeStr = activeRecord.punchIn;
+                                    dateObj = new Date(`${year}-${month}-${day} ${timeStr}`);
+                                } else {
+                                    dateObj = new Date(activeRecord.date + ' ' + activeRecord.punchIn);
+                                }
+                            } else if (activeRecord.timestamp) {
+                                dateObj = new Date(activeRecord.timestamp);
+                            }
+
+                            if (dateObj && !isNaN(dateObj.getTime())) {
+                                setPunchInTime(dateObj);
+                            }
+                        } catch (e) {
+                            console.error("Error parsing date:", e);
                         }
-                    } catch (e) {
-                        console.error("Error parsing date:", e);
                     }
                 }
             })
             .catch(err => console.error("Failed to load history:", err));
-    }, []);
+    }, [token]);
 
     const punchIn = () => {
+        if (!token) return;
+
         const now = new Date();
         setPunchInTime(now);
         setPunchOutTime(null);
@@ -71,15 +75,18 @@ export const AttendanceProvider = ({ children }) => {
 
         setHistory(prev => [newRecord, ...prev]);
 
-        fetch('http://localhost:5001/api/attendance', {
+        fetch('/api/attendance', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            },
             body: JSON.stringify(newRecord)
         }).catch(err => console.error("Failed to save punch-in:", err));
     };
 
     const punchOut = () => {
-        if (!punchInTime) return;
+        if (!punchInTime || !token) return;
 
         const now = new Date();
         setPunchOutTime(now);
@@ -101,7 +108,6 @@ export const AttendanceProvider = ({ children }) => {
             if (isDurationOver8_5) {
                 status = "LP";
             } else {
-                // Fix: Logic check - is duration < 8.5?
                 status = "LA";
             }
         } else {
@@ -123,7 +129,6 @@ export const AttendanceProvider = ({ children }) => {
 
         const updatedRecord = {
             ...pendingRecord,
-            // If we couldn't find a pending record (edge case), create new details
             id: pendingRecord.id || Date.now(),
             date: pendingRecord.date || punchInTime.toLocaleDateString(),
             day: dayOfWeek,
@@ -143,7 +148,10 @@ export const AttendanceProvider = ({ children }) => {
         // Save to Server
         fetch('/api/attendance', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            },
             body: JSON.stringify(updatedRecord)
         }).catch(err => console.error("Failed to save record:", err));
     };

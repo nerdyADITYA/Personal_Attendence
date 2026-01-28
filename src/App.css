@@ -10,6 +10,36 @@
   --shadow-glow: 0 0 20px rgba(0, 243, 255, 0.3);
 }
 
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  max-width: 600px;
+  /* Match app width if possible, or usually app is centered */
+  margin-bottom: 20px;
+}
+
+.user-info {
+  display: flex;
+  gap: 15px;
+  align-items: center;
+}
+
+.logout-btn {
+  background: rgba(255, 50, 50, 0.2);
+  border: 1px solid rgba(255, 50, 50, 0.5);
+  color: white;
+  padding: 5px 10px;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.logout-btn:hover {
+  background: rgba(255, 50, 50, 0.4);
+}
+
 body {
   margin: 0;
   font-family: 'Inter', 'Segoe UI', sans-serif;

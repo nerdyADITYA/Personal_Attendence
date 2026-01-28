@@ -1,8 +1,11 @@
+
 import React from "react";
 import * as XLSX from 'xlsx';
 import { useAttendance } from "../context/AttendanceContext";
 
-export default function ExportButton() {
+const ExportButton = () => {
+    // The history from context is now ALREADY filtered by the backend for the current user.
+    // So no changes needed to the logic here! It will export exactly what is in 'history'.
     const { history } = useAttendance();
 
     const exportMonth = () => {
@@ -39,3 +42,5 @@ export default function ExportButton() {
         </div>
     );
 }
+
+export default ExportButton;
