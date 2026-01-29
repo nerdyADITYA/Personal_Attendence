@@ -15,7 +15,8 @@ async function connectToDatabase() {
 
 const userSchema = new mongoose.Schema({
     username: { type: String, required: true, unique: true },
-    password: { type: String, required: true }
+    password: { type: String, required: true },
+    email: { type: String, required: true, unique: true }
 });
 const User = mongoose.models.User || mongoose.model('User', userSchema);
 const JWT_SECRET = process.env.JWT_SECRET || 'fallback_secret';
