@@ -1,0 +1,15 @@
+name: Trigger Reminders
+
+on:
+  schedule:
+    - cron: '*/30 * * * *' # Run every 30 minutes
+  workflow_dispatch: # Allow manual trigger
+
+jobs:
+  ping-api:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Call API Endpoint
+        run: |
+          # Replace with your actual Vercel App URL
+          curl -X GET https://personal-attendence.vercel.app/api/cron/reminders
