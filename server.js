@@ -48,7 +48,8 @@ const recordSchema = new mongoose.Schema({
     duration: String,
     status: String,
     timestamp: String,
-    lastReminderSentAt: Date // New field for reminder tracking
+    lastReminderSentAt: Date, // New field for reminder tracking
+    isHalfDay: { type: Boolean, default: false } // New field for Half Day
 });
 
 const User = mongoose.model('User', userSchema);
@@ -68,6 +69,7 @@ const transporter = nodemailer.createTransport({
 
 // Reminder Logic
 const SHIFT_DURATION_MS = 9.5 * 60 * 60 * 1000; // 9.5 hours
+const HALF_DAY_DURATION_MS = 4.5 * 60 * 60 * 1000; // 4.5 hours for Half Day reminder
 const REMINDER_INTERVAL_MS = 30 * 60 * 1000; // 30 minutes
 
 async function checkReminders() {
@@ -104,7 +106,10 @@ async function checkReminders() {
 
             const elapsed = now - punchInTime;
 
-            if (elapsed > SHIFT_DURATION_MS) {
+            // const elapsed = now - punchInTime; // ALREADY DECLARED ABOVE
+            const requiredDuration = record.isHalfDay ? HALF_DAY_DURATION_MS : SHIFT_DURATION_MS;
+
+            if (elapsed > requiredDuration) {
                 // Check if we should send a reminder
                 const lastSent = record.lastReminderSentAt ? new Date(record.lastReminderSentAt) : null;
 
@@ -117,11 +122,11 @@ async function checkReminders() {
                             from: process.env.SMTP_EMAIL,
                             to: record.userId.email,
                             subject: 'Shift Ended - Please Punch Out',
-                            text: `Hello ${record.userId.username},\n\nYour shift of 9.5 hours has ended. Please remember to punch out.\n\nIgnore this message if you are doing overtime.`,
+                            text: `Hello ${record.userId.username},\n\nYour shift of ${record.isHalfDay ? '4.5' : '9.5'} hours has ended. Please remember to punch out.\n\nIgnore this message if you are doing overtime.`,
                             html: `
                                 <h2>Shift Ended Reminder</h2>
                                 <p>Hello <b>${record.userId.username}</b>,</p>
-                                <p>Your shift of 9.5 hours has ended. Please remember to punch out.</p>
+                                <p>Your shift of ${record.isHalfDay ? '4.5' : '9.5'} hours has ended. Please remember to punch out.</p>
                                 <br>
                                 <p><i>Ignore this message if you are doing overtime.</i></p>
                             `
@@ -144,8 +149,12 @@ async function checkReminders() {
     }
 }
 
-// Run check every minute
-setInterval(checkReminders, 60 * 1000);
+// Cron Route for Vercel
+app.get('/api/cron/reminders', async (req, res) => {
+    console.log("Cron job triggered: Checking reminders...");
+    await checkReminders();
+    res.status(200).json({ success: true, message: "Reminders checked" });
+});
 
 // Auth Middleware
 const authenticateToken = (req, res, next) => {

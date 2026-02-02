@@ -1,5 +1,6 @@
 import React, { createContext, useState, useEffect, useContext } from 'react';
 import { useAuth } from './AuthContext';
+import { calculateStatus } from '../utils/statusCalculator';
 
 const AttendanceContext = createContext();
 
@@ -54,7 +55,7 @@ export const AttendanceProvider = ({ children }) => {
             .catch(err => console.error("Failed to load history:", err));
     }, [token]);
 
-    const punchIn = () => {
+    const punchIn = (isHalfDay = false) => {
         if (!token) return;
 
         const now = new Date();
@@ -70,7 +71,8 @@ export const AttendanceProvider = ({ children }) => {
             punchOut: null, // Pending
             duration: null,
             status: 'Working',
-            timestamp: now.toISOString() // Defines the punch-in absolute time
+            timestamp: now.toISOString(), // Defines the punch-in absolute time
+            isHalfDay: isHalfDay
         };
 
         setHistory(prev => [newRecord, ...prev]);
@@ -94,38 +96,16 @@ export const AttendanceProvider = ({ children }) => {
         const durationMs = now - punchInTime;
         const durationHours = durationMs / (1000 * 60 * 60);
 
-        // Formula Implementation
-        const punchInHour = punchInTime.getHours();
-        const punchInMinute = punchInTime.getMinutes();
-        const isLatePunchIn = (punchInHour > 10) || (punchInHour === 10 && punchInMinute > 0);
-        const isDurationOver8_5 = durationHours >= 8.5;
-        const isDurationOver4 = durationHours > 4;
         const dayOfWeek = punchInTime.toLocaleDateString('en-US', { weekday: 'short' });
-
-        let status = "A";
-
-        if (isLatePunchIn) {
-            if (isDurationOver8_5) {
-                status = "LP";
-            } else {
-                status = "LA";
-            }
-        } else {
-            if (isDurationOver8_5) {
-                status = "OP";
-            } else {
-                if (dayOfWeek === "Sun") {
-                    status = "OFF";
-                } else if (isDurationOver4) {
-                    status = "OA";
-                } else {
-                    status = "A";
-                }
-            }
-        }
 
         // Find the pending record to update
         const pendingRecord = history.find(r => r.punchOut === null) || {};
+
+        // Calculate Status using shared utility
+        const status = calculateStatus({
+            durationHours: durationHours,
+            isHalfDay: pendingRecord.isHalfDay || false
+        });
 
         const updatedRecord = {
             ...pendingRecord,
