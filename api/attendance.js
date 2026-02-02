@@ -41,7 +41,9 @@ const recordSchema = new mongoose.Schema({
     punchOut: String,
     duration: String,
     status: String,
-    timestamp: String
+    timestamp: String,
+    lastReminderSentAt: Date, // Added
+    isHalfDay: { type: Boolean, default: false } // Added
 });
 
 // Prevent model recompilation in serverless hot reloads
