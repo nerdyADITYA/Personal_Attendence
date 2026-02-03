@@ -384,8 +384,8 @@ h1 {
   }
 
   .clock {
-    font-size: 18vw;
-    /* Larger relative to screen width on mobile */
+    font-size: 12vw;
+    /* Reduced to fit 11-12 chars (HH:MM:SS PM) */
     padding: 0.5rem;
     border-width: 0;
     /* Cleaner look on small screens */
