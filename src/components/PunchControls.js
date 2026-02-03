@@ -91,9 +91,11 @@ export default function PunchControls() {
                 )}
             </div>
 
+
             <Modal
                 show={showModal}
                 remainingTime={remainingTime}
+                requiredHours={isCurrentHalfDay ? 4.75 : 9.5} // Pass dynamic hours
                 onConfirm={confirmEarlyPunchOut}
                 onCancel={() => setShowModal(false)}
             />

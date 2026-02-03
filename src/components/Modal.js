@@ -1,4 +1,4 @@
-export default function Modal({ show, onConfirm, onCancel, remainingTime }) {
+export default function Modal({ show, onConfirm, onCancel, remainingTime, requiredHours }) {
     if (!show) return null;
 
 
@@ -6,7 +6,7 @@ export default function Modal({ show, onConfirm, onCancel, remainingTime }) {
         <div className="modal-overlay">
             <div className="modal-content glass-panel">
                 <h3 className="modal-title">Early Punch Out</h3>
-                <p className="modal-text">You haven't completed 9.5 hours.</p>
+                <p className="modal-text">You haven't completed {requiredHours} hours.</p>
                 <p className="modal-text" style={{ color: 'var(--neon-blue)', fontWeight: 'bold' }}>
                     Time Remaining: {remainingTime}
                 </p>
