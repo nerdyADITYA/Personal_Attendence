@@ -50,35 +50,30 @@ export default function PunchControls() {
     return (
         <>
             {punchInTime && (
-                <div style={{ textAlign: 'center', marginBottom: '20px' }}>
-                    <div className="status-info" style={{
-                        fontSize: '1.2rem',
-                        color: 'var(--neon-green)',
-                        textShadow: '0 0 10px rgba(0, 255, 157, 0.3)',
-                        marginBottom: '5px'
-                    }}>
+                <div className="punch-status-container">
+                    <div className="punch-status-info">
                         Punched In at: {punchInTime.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true })}
                     </div>
                     {/* Expected Punch Out Display */}
-                    <div style={{ color: '#ccc', fontSize: '0.9rem' }}>
+                    <div className="expected-out-display">
                         Expected Punch Out: {
                             new Date(punchInTime.getTime() + (isCurrentHalfDay ? 4.75 : 9.5) * 60 * 60 * 1000)
                                 .toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true })
                         }
-                        {isCurrentHalfDay && <span style={{ marginLeft: '10px', color: '#ffcc00' }}>(Half Day)</span>}
+                        {isCurrentHalfDay && <span className="half-day-label">(Half Day)</span>}
                     </div>
                 </div>
             )}
 
             <div className="controls">
                 {!isPunchedIn && (
-                    <div style={{ marginBottom: '15px' }}>
-                        <label style={{ color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}>
+                    <div className="checkbox-container">
+                        <label className="checkbox-label">
                             <input
                                 type="checkbox"
                                 checked={isHalfDayMode}
                                 onChange={(e) => setIsHalfDayMode(e.target.checked)}
-                                style={{ marginRight: '10px', width: '18px', height: '18px' }}
+                                className="mode-checkbox"
                             />
                             Half Day Mode (Min 4.75h)
                         </label>

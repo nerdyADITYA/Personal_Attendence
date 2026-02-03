@@ -199,7 +199,8 @@ h1 {
 
 .modal-content {
   padding: 2.5rem;
-  width: 400px;
+  width: 90%;
+  max-width: 400px;
   text-align: center;
   animation: modalPop 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
@@ -311,5 +312,101 @@ h1 {
   .btn-punch {
     width: 100%;
     max-width: 300px;
+  }
+}
+
+/* Punch Control Styles (Moved from inline) */
+.punch-status-container {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.punch-status-info {
+  font-size: 1.2rem;
+  color: var(--neon-green);
+  text-shadow: 0 0 10px rgba(0, 255, 157, 0.3);
+  margin-bottom: 5px;
+}
+
+.expected-out-display {
+  color: #ccc;
+  font-size: 0.9rem;
+}
+
+.half-day-label {
+  margin-left: 10px;
+  color: #ffcc00;
+}
+
+.checkbox-container {
+  margin-bottom: 15px;
+}
+
+.checkbox-label {
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  user-select: none;
+  /* Good for mobile */
+}
+
+.mode-checkbox {
+  margin-right: 10px;
+  width: 18px;
+  height: 18px;
+  accent-color: var(--neon-green);
+  /* Modern checkbox styling */
+}
+
+/* Enhanced Mobile Responsiveness */
+@media (max-width: 480px) {
+  .app {
+    padding: 1rem 0.5rem;
+    gap: 1rem;
+    height: auto;
+    /* Allow scrolling on small screens if needed */
+    min-height: 100vh;
+  }
+
+  h1 {
+    font-size: 1.5rem;
+  }
+
+  .header {
+    flex-direction: column;
+    margin-bottom: 10px;
+  }
+
+  .user-info {
+    font-size: 0.9rem;
+  }
+
+  .clock {
+    font-size: 18vw;
+    /* Larger relative to screen width on mobile */
+    padding: 0.5rem;
+    border-width: 0;
+    /* Cleaner look on small screens */
+    background: transparent;
+    text-shadow: 0 0 10px rgba(0, 243, 255, 0.3);
+  }
+
+  .modal-content {
+    width: 90%;
+    /* Responsive width */
+    padding: 1.5rem;
+    margin: 0 1rem;
+  }
+
+  .controls {
+    flex-direction: column;
+  }
+
+  .btn-punch {
+    font-size: 1rem;
+    padding: 12px 30px;
+    width: 100%;
   }
 }
